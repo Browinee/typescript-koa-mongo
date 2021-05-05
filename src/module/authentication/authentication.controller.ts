@@ -1,12 +1,13 @@
 import {Next, Context} from "koa";
 import Router from "koa-router";
+import bcrypt from "bcrypt";
 import Controller from "../../interfaces/controller.interface";
 import userModel from "../user/model/user.model";
 import AuthenticationService from "./authentication.service";
 import validationMiddleware from "../../middleware/validation.middleware";
 import CreateUserDto from "../user/dto/user.dto";
 import LoginDto from "./dto/login.dto";
-
+import WrongCredentialsException from "../../exceptions/WrongCredentialsException";
 
 class AuthenticationController implements Controller {
     public path = '/auth';
@@ -21,7 +22,7 @@ class AuthenticationController implements Controller {
     private initializeRoutes() {
         this.router.post(`${this.path}/register`, this.registration);
         this.router.post(`${this.path}/login`, validationMiddleware(LoginDto), this.loggingIn);
-        this.router.post(`${this.path}/logout`, this.loggingOut);
+        this.router.get(`${this.path}/logout`, this.loggingOut);
     }
 
     private registration = async (ctx: Context, next: Next) => {
@@ -37,8 +38,28 @@ class AuthenticationController implements Controller {
     }
 
     private loggingIn = async (ctx: Context, next: Next) => {
+        const logInData: LoginDto = ctx.request.body;
+        const user = await this.user.findOne({ email: logInData.email });
+        if (user) {
+            const isPasswordMatching = await bcrypt.compare(
+                logInData.password,
+                user.get('password', null, { getters: false }),
+            );
+            if (isPasswordMatching) {
+                const tokenData = this.authenticationService.createToken(user);
+                const cookie = this.authenticationService.createCookie(tokenData);
+                ctx.cookies.set(cookie.name, cookie.value, cookie.option);
+                ctx.body = user;
+            } else {
+                throw new WrongCredentialsException();
+            }
+        } else {
+            throw new WrongCredentialsException();
+        }
     }
     private loggingOut = async (ctx: Context, next: Next) => {
+        ctx.cookies.set('Authorization','',{maxAge:0})
+        ctx.status = 204;
     }
 
 }
