@@ -1,9 +1,10 @@
 import Koa from "koa";
 import  cookieParser from 'koa-cookie';
-import * as mongoose from 'mongoose';
+import  mongoose from 'mongoose';
 import bodyParser from 'koa-bodyparser';
 import Controller from "./interfaces/controller.interface";
 import errorMiddleware from './middleware/error.middleware';
+import Logger from "./middleware/logger";
 
 class App {
     public app: any;
@@ -28,6 +29,7 @@ class App {
     private initializeMiddlewares() {
         this.app.use(bodyParser());
         this.app.use(cookieParser());
+        this.app.use(Logger);
     }
 
     private initializeErrorHandling() {
@@ -36,17 +38,14 @@ class App {
 
     private initializeControllers(controllers: Controller[]) {
         controllers.forEach((controller) => {
-            this.app.use('/', controller.router);
+            this.app.use(controller.router.routes());
         });
     }
-
     private connectToTheDatabase() {
         const {
-            MONGO_USER,
-            MONGO_PASSWORD,
             MONGO_PATH,
         } = process.env;
-        // mongoose.connect(`mongodb://${MONGO_USER}:${MONGO_PASSWORD}${MONGO_PATH}`);
+        mongoose.connect(MONGO_PATH);
     }
 }
 

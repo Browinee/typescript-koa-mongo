@@ -1,5 +1,5 @@
 
-import { Router } from 'koa-router';
+import Router  from 'koa-router';
 
 interface Controller {
     path: string;
