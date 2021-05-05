@@ -32,7 +32,7 @@ class AuthenticationController implements Controller {
             ctx.cookies.set(cookie.name, cookie.value, cookie.option);
             ctx.body = user;
         } catch (error) {
-            throw error;
+            ctx.throw(error.status, error.message);
         }
 
     }
