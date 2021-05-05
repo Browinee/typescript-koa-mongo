@@ -4,7 +4,7 @@ import  mongoose from 'mongoose';
 import bodyParser from 'koa-bodyparser';
 import Controller from "./interfaces/controller.interface";
 import errorMiddleware from './middleware/error.middleware';
-import Logger from "./middleware/logger";
+import Logger from "./middleware/logger.middleware";
 
 class App {
     public app: any;
@@ -14,7 +14,6 @@ class App {
         this.connectToTheDatabase();
         this.initializeMiddlewares();
         this.initializeControllers(controllers);
-        this.initializeErrorHandling();
     }
 
     listen() {
@@ -27,14 +26,12 @@ class App {
     }
 
     private initializeMiddlewares() {
+        this.app.use(Logger);
+        this.app.use(errorMiddleware);
         this.app.use(bodyParser());
         this.app.use(cookieParser());
-        this.app.use(Logger);
     }
 
-    private initializeErrorHandling() {
-        this.app.use(errorMiddleware);
-    }
 
     private initializeControllers(controllers: Controller[]) {
         controllers.forEach((controller) => {
@@ -45,7 +42,7 @@ class App {
         const {
             MONGO_PATH,
         } = process.env;
-        mongoose.connect(MONGO_PATH, { useNewUrlParser: true, useUnifiedTopology: true });
+        mongoose.connect(MONGO_PATH, { useFindAndModify: false, useNewUrlParser: true, useUnifiedTopology: true });
     }
 }
 

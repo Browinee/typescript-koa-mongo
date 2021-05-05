@@ -5,6 +5,6 @@ const devOpts = {
 
 const env = process.env.NODE_ENV;
 
-const logger = env === "production" ? koaPino() : koaPino(devOpts);
+const LoggerMiddleware = env === "production" ? koaPino() : koaPino(devOpts);
 
-export default logger;
+export default LoggerMiddleware;

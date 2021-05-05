@@ -1,7 +1,11 @@
-interface Post {
-    authorId: string;
-    content: string;
-    title: string;
+import { IsString } from 'class-validator';
+
+class CreatePostDto {
+    @IsString()
+    public content: string;
+
+    @IsString()
+    public title: string;
 }
 
-export default Post;
+export default CreatePostDto;
