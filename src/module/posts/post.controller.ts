@@ -4,9 +4,9 @@ import Controller from '../../interfaces/controller.interface';
 // import RequestWithUser from '../interfaces/requestWithUser.interface';
 // import authMiddleware from '../middleware/auth.middleware';
 import validationMiddleware from '../../middleware/validation.middleware';
-import CreatePostDto from './post.dto';
+import CreatePostDto from './dto/post.dto';
 import Post from './post.interface';
-import postModel from './post.model';
+import postModel from './model/post.model';
 import PostNotFoundException from "../../exceptions/PostNotFoundException";
 
 class PostController implements Controller {
@@ -53,7 +53,6 @@ class PostController implements Controller {
         const postData: Post = ctx.request.body;
         const post = await this.post.findByIdAndUpdate(id, postData, { new: true });
         if (post) {
-        console.log("modifPost-------", post);
             ctx.body = post;
         } else {
             console.log(123);
