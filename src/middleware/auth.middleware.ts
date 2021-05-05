@@ -3,6 +3,7 @@ import {Next} from "koa";
 import jwt from "jsonwebtoken";
 import userModel from "../module/user/model/user.model";
 import WrongAuthenticationTokenException from "../exceptions/WrongAuthenticationTokenException";
+import RequestWithUser from "../interfaces/requestWIthUser.interface";
 
 async function authMiddleware(ctx: Context, next: Next) {
     const cookie = ctx.cookie;
@@ -13,7 +14,7 @@ async function authMiddleware(ctx: Context, next: Next) {
             const id = verification._id;
             const user = await userModel.findById(id);
             if (user) {
-                (ctx.request as any).user = user;
+                (ctx.request as RequestWithUser).user = user;
                 await next();
             } else {
                 throw new WrongAuthenticationTokenException();

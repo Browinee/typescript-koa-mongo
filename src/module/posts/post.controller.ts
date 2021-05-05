@@ -1,7 +1,7 @@
 import {Context, Next,} from "koa";
 import Router from "koa-router";
 import Controller from '../../interfaces/controller.interface';
-// import RequestWithUser from '../interfaces/requestWithUser.interface';
+import RequestWithUser from "../../interfaces/requestWIthUser.interface";
 // import authMiddleware from '../middleware/auth.middleware';
 import validationMiddleware from '../../middleware/validation.middleware';
 import CreatePostDto from './dto/post.dto';
