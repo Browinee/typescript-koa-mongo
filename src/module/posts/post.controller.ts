@@ -8,6 +8,7 @@ import CreatePostDto from './dto/post.dto';
 import Post from './post.interface';
 import postModel from './model/post.model';
 import PostNotFoundException from "../../exceptions/PostNotFoundException";
+import authMiddleware from "../../middleware/auth.middleware";
 
 class PostController implements Controller {
     public path = '/posts';
@@ -19,15 +20,13 @@ class PostController implements Controller {
     }
 
     private initializeRoutes() {
-        this.router.post(this.path,  validationMiddleware(CreatePostDto),  this.createPost);
         this.router.get(this.path, this.getAllPosts);
         this.router.get(`${this.path}/:id`, this.getPostById);
-        this.router.patch(`${this.path}/:id`, validationMiddleware(CreatePostDto, true), this.modifyPost)
-        // this.router
-        //     .all(`${this.path}/*`, authMiddleware)
-        //     .patch(`${this.path}/:id`, validationMiddleware(CreatePostDto, true), this.modifyPost)
-        //     .delete(`${this.path}/:id`, this.deletePost)
-        //     .post(this.path, authMiddleware, validationMiddleware(CreatePostDto), this.createPost);
+        this.router
+            .all(`${this.path}/(.*)`, authMiddleware)
+            .patch(`${this.path}/:id`, validationMiddleware(CreatePostDto, true), this.modifyPost)
+            .delete(`${this.path}/:id`, this.deletePost)
+            .post(this.path, authMiddleware, validationMiddleware(CreatePostDto), this.createPost);
     }
 
     private getAllPosts = async (ctx: Context) => {
