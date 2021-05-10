@@ -63,11 +63,11 @@ class PostController implements Controller {
         const postData: CreatePostDto = ctx.request.body;
         const createdPost = new this.post({
             ...postData,
-            // author: request.user._id,
+            author: (ctx.request as RequestWithUser).user._id,
         });
         const savedPost = await createdPost.save();
         console.log("psot", createdPost);
-        // await savedPost.populate('author', '-password').execPopulate();
+        await savedPost.populate("author","-password").execPopulate();
         ctx.status = 201;
         ctx.body = savedPost;
     }
